@@ -503,7 +503,7 @@ const compileObjectLiteral = (opts: CompileExprOpts<ObjectLiteral>) => {
 
   const objectType = getExprType(obj) as ObjectType;
   const literalBinType = mapBinaryenType(
-    { ...opts, useOriginalType: true },
+    { ...opts, useStructuralType: true },
     objectType
   );
 
@@ -553,7 +553,7 @@ const getFunctionVarTypes = (opts: CompileExprOpts, fn: Fn) =>
   fn.variables.map((v) => mapBinaryenType(opts, v.type!));
 
 type MapBinTypeOpts = CompileExprOpts & {
-  useOriginalType?: boolean; // Use the original type of the object literal, i.e. to initialize an object literal, who normally returns the base object type
+  useStructuralType?: boolean; // Use the original type of the object literal, i.e. to initialize an object literal, who normally returns the base object type
 };
 
 export const mapBinaryenType = (
@@ -617,8 +617,8 @@ const OBJECT_FIELDS_OFFSET = 2;
 
 /** TODO: Skip building types for object literals that are part of an initializer of an obj */
 const buildObjectType = (opts: MapBinTypeOpts, obj: ObjectType): TypeRef => {
-  if (opts.useOriginalType && obj.getAttribute("originalType")) {
-    return obj.getAttribute("originalType") as TypeRef;
+  if (opts.useStructuralType && obj.getAttribute("structuralType")) {
+    return obj.getAttribute("structuralType") as TypeRef;
   }
 
   if (obj.binaryenType) return obj.binaryenType;
@@ -675,11 +675,11 @@ const buildObjectType = (opts: MapBinTypeOpts, obj: ObjectType): TypeRef => {
   }
 
   if (obj.isStructural) {
-    obj.setAttribute("originalType", obj.binaryenType);
+    obj.setAttribute("structuralType", obj.binaryenType);
     obj.binaryenType = mapBinaryenType(opts, voydBaseObject);
   }
 
-  if (opts.useOriginalType) return binaryenType;
+  if (opts.useStructuralType) return binaryenType;
   return obj.binaryenType;
 };
 
